@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Voor Lana</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,500;1,600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --peach: #FFD9B3;
+    --coral: #FF6F5E;
+    --sun: #FFD23F;
+    --teal: #5EC9C2;
+    --ink: #3B2A4A;
+    --cream: #FFFCF7;
+  }
+
+  *{ box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html{ -webkit-text-size-adjust: 100%; }
+
+  body{
+    margin:0;
+    font-family: 'Poppins', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    overflow-x: hidden;
+    width: 100%;
+  }
+
+  h1,h2,h3{ font-family: 'Fraunces', serif; margin: 0; }
+
+  /* ============ ENVELOP ============ */
+  #envelope-screen{
+    position: fixed; inset: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, var(--peach), var(--sun) 60%, var(--coral));
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+    padding: 5vw;
+  }
+  #envelope-screen.hidden{ opacity: 0; visibility: hidden; pointer-events: none; }
+
+  .envelope{ position: relative; width: min(340px, 82vw); aspect-ratio: 3/2; cursor: pointer; touch-action: manipulation; }
+  .env-back{ position:absolute; inset:0; background: var(--cream); border-radius: 6px; box-shadow: 0 20px 50px rgba(59,42,74,0.25); }
+  .env-flap{
+    position:absolute; top:0; left:0; right:0; height: 55%;
+    background: var(--coral);
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    transform-origin: top;
+    transition: transform 0.7s cubic-bezier(.7,-0.4,.3,1.4);
+    z-index: 3;
+  }
+  .envelope.open .env-flap{ transform: rotateX(180deg); }
+  .env-label{
+    position:absolute; bottom: 22%; left: 0; right:0; text-align:center;
+    font-family:'Fraunces', serif; font-style: italic;
+    font-size: clamp(1.1rem, 5vw, 1.6rem); color: var(--ink); z-index: 1; padding: 0 1rem;
+  }
+  .seal{
+    position:absolute; top: 50%; left:50%; transform: translate(-50%,-50%);
+    width: 60px; height:60px; background: var(--ink); border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    color: var(--sun); font-family:'Fraunces', serif; font-weight:700; font-size: 1.4rem;
+    z-index: 4; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: transform 0.3s ease;
+  }
+  .envelope:hover .seal{ transform: translate(-50%,-50%) scale(1.08); }
+  .envelope.open .seal{ animation: pop-seal 0.5s forwards; }
+  @keyframes pop-seal{ to{ opacity:0; transform: translate(-50%,-50%) scale(0.3); } }
+
+  .envelope-hint{ position:absolute; bottom: -46px; left:0; right:0; text-align:center; font-size:0.85rem; color: var(--ink); opacity:0.7; }
+
+  #confetti-layer{ position:fixed; inset:0; pointer-events:none; z-index: 99; overflow:hidden; }
+  .confetti-piece{ position:absolute; top:-10px; border-radius:2px; opacity:0.9; animation: fall linear forwards; }
+  @keyframes fall{ to{ transform: translateY(110vh) rotate(540deg); opacity:0.3; } }
+
+  /* ============ SITE ============ */
+  #site{ opacity:0; transition: opacity 1s ease 0.3s; width:100%; overflow-x: hidden; }
+  #site.visible{ opacity:1; }
+
+  section{ padding: 5rem 6vw; max-width: 1100px; margin: 0 auto; }
+  @media (max-width: 600px){ section{ padding: 3.5rem 6vw; } }
+
+  /* HERO */
+  .hero{ text-align:center; padding-top: 7rem; }
+  @media (max-width:600px){ .hero{ padding-top: 5rem; } }
+  .hero .eyebrow{ font-size:0.85rem; letter-spacing:0.15em; text-transform:uppercase; color: var(--coral); font-weight:600; }
+  .hero h1{ font-size: clamp(2.2rem, 10vw, 5rem); font-weight:600; margin: 0.5rem 0 1rem; line-height:1.05; word-wrap: break-word; }
+  .hero h1 em{ color: var(--coral); font-style: italic; }
+  .hero p{ font-size: clamp(1rem, 3.5vw, 1.15rem); max-width:520px; margin: 0 auto; opacity:0.85; }
+  .hero .big-number{
+    font-family:'Fraunces', serif;
+    font-size: clamp(4rem, 22vw, 8rem);
+    color: var(--coral);
+    line-height: 0.9;
+    margin: 1.5rem 0 0;
+    font-weight: 700;
+  }
+  .hero .big-number-label{ font-size:0.9rem; opacity:0.6; letter-spacing:0.1em; text-transform:uppercase; }
+  .hero .doodle{ font-size:2.5rem; margin-top:1.5rem; animation: bob 2.4s ease-in-out infinite; }
+  @keyframes bob{ 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-10px); } }
+
+  /* REDENEN */
+  .reasons h2{ font-size: clamp(1.6rem,6vw,2.6rem); text-align:center; margin-bottom: 0.5rem; }
+  .reasons h2 span{ color: var(--teal); font-style:italic; }
+  .reasons .sub{ text-align:center; opacity:0.7; font-size:0.9rem; margin-bottom: 2.5rem; }
+
+  .reason-grid{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+  @media (max-width: 800px){ .reason-grid{ grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 460px){ .reason-grid{ grid-template-columns: 1fr; } }
+
+  .reason-card{
+    background: white;
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+    box-shadow: 0 6px 18px rgba(59,42,74,0.1);
+    position: relative;
+    transition: transform 0.2s ease;
+  }
+  .reason-card:hover{ transform: translateY(-3px); }
+  .reason-card .num{
+    font-family:'Fraunces', serif;
+    font-style: italic;
+    font-size: 0.8rem;
+    color: var(--coral);
+    display:block;
+    margin-bottom: 0.35rem;
+  }
+  .reason-card p{ margin:0; font-size:0.95rem; line-height:1.4; }
+
+  /* GALERIJ */
+  .gallery h2{ font-size: clamp(1.6rem,6vw,2.6rem); text-align:center; margin-bottom:1rem; }
+  .gallery .note{ text-align:center; opacity:0.7; font-size:0.85rem; margin-bottom:2rem; padding: 0 2vw; }
+  .gallery-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 0.8rem; }
+  .gallery-slot{
+    aspect-ratio: 1/1; border-radius: 10px; display:flex; align-items:center; justify-content:center;
+    font-size:0.8rem; color: rgba(59,42,74,0.5); text-align:center; padding: 0.5rem;
+    border: 2px dashed rgba(59,42,74,0.25);
+  }
+
+  /* REVIEWS */
+  .reviews{ background: var(--peach); border-radius: 24px; }
+  .reviews-header{ text-align:center; margin-bottom: 2.5rem; }
+  .reviews-header h2{ font-size: clamp(1.6rem,6vw,2.6rem); }
+  .reviews-header .rating-line{
+    margin-top: 0.8rem;
+    font-size: 1rem;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .stars{ color: var(--coral); letter-spacing: 2px; font-size: 1.1rem; }
+  .reviews-header .count{ opacity:0.7; font-size:0.9rem; }
+  .reviews-header .tagline{ margin-top:0.6rem; font-size:0.85rem; opacity:0.65; font-style: italic; }
+
+  .review-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.2rem;
+  }
+  .review-card{
+    background: var(--cream);
+    border-radius: 12px;
+    padding: 1.3rem 1.4rem;
+    box-shadow: 0 6px 18px rgba(59,42,74,0.08);
+  }
+  .review-card .stars{ margin-bottom: 0.5rem; display:block; }
+  .review-card p.text{ font-size:0.92rem; line-height:1.5; margin: 0 0 0.9rem; }
+  .review-card .reviewer{
+    display:flex; align-items:center; gap: 0.6rem;
+    font-size:0.85rem;
+  }
+  .review-card .avatar{
+    width: 32px; height:32px; border-radius:50%;
+    background: var(--teal);
+    color: white;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Fraunces', serif; font-weight:700; font-size:0.85rem;
+    flex-shrink:0;
+  }
+  .review-card .meta{ display:flex; flex-direction:column; }
+  .review-card .meta .name{ font-weight:600; }
+  .review-card .meta .badge{ font-size:0.72rem; opacity:0.6; }
+  .review-card.empty{
+    border: 2px dashed rgba(59,42,74,0.25);
+    background: transparent;
+    box-shadow:none;
+    display:flex; align-items:center; justify-content:center;
+    text-align:center;
+    font-size:0.85rem;
+    opacity:0.6;
+    min-height: 140px;
+  }
+
+  /* METER */
+  .meter-section{ text-align:center; }
+  .meter-section h2{ font-size: clamp(1.4rem,6vw,2.3rem); margin-bottom: 0.5rem; }
+  .meter-section p.sub{ opacity:0.75; margin-bottom:2rem; font-size: clamp(0.85rem,3vw,1rem); padding: 0 2vw;}
+  #meter-btn{
+    font-family:'Poppins', sans-serif; font-weight:600; font-size:1rem;
+    padding: 0.9rem 2rem; border-radius: 999px; border:none;
+    background: var(--coral); color: white; cursor:pointer;
+    box-shadow: 0 8px 20px rgba(255,111,94,0.4);
+    transition: transform 0.15s ease; touch-action: manipulation;
+  }
+  #meter-btn:active{ transform: scale(0.95); }
+  .meter-bar-track{ max-width: 480px; margin: 2rem auto 0.5rem; height: 20px; background: rgba(59,42,74,0.1); border-radius: 999px; overflow:hidden; }
+  .meter-bar-fill{ height:100%; width:0%; background: linear-gradient(90deg, var(--sun), var(--coral)); border-radius:999px; transition: width 0.4s ease; }
+  .meter-label{ font-family:'Fraunces', serif; font-style:italic; font-size: clamp(0.95rem,3.5vw,1.1rem); padding: 0 3vw; }
+
+  /* AFSLUITER */
+  .closing{ text-align:center; padding-bottom: 6rem; }
+  .closing h2{ font-size: clamp(1.7rem,7vw,3.2rem); font-style: italic; max-width: 600px; margin: 0 auto 1rem; line-height:1.25; }
+  .closing .sign{ margin-top:2rem; font-family:'Fraunces', serif; font-style:italic; font-size: clamp(1.1rem,4vw,1.3rem); color: var(--coral); }
+  .closing .shout{ margin-top: 3rem; font-family:'Poppins', sans-serif; font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.5; }
+
+  @media (prefers-reduced-motion: reduce){
+    .hero .doodle{ animation:none; }
+    .confetti-piece{ animation:none; display:none; }
+  }
+</style>
+</head>
+<body>
+
+  <div id="envelope-screen">
+    <div class="envelope" id="envelope">
+      <div class="env-back"></div>
+      <div class="env-label">voor Lana</div>
+      <div class="env-flap"></div>
+      <div class="seal">L</div>
+      <div class="envelope-hint">tik om te openen</div>
+    </div>
+  </div>
+  <div id="confetti-layer"></div>
+
+  <div id="site">
+
+    <section class="hero">
+      <div class="eyebrow">een klein verrassinkje</div>
+      <h1>Hoi, <em>Lana</em>.</h1>
+      <p>[Vul hier zelf iets in: waarom je dit gemaakt hebt — bijvoorbeeld dat ze vandaag 27 wordt.]</p>
+      <div class="big-number">27</div>
+      <div class="big-number-label">redenen om van jou te houden</div>
+      <div class="doodle">💛</div>
+    </section>
+
+    <section class="reasons">
+      <h2>27 redenen, <span>op haar 27e</span></h2>
+      <p class="sub">één voor elk jaar — bewerk de lijst in het bestand om ze echt te maken</p>
+      <div class="reason-grid" id="reason-grid"></div>
+    </section>
+
+    <section class="gallery">
+      <h2>wij, in foto's</h2>
+      <p class="note">Vervang elk vak hieronder door een &lt;img&gt;-tag met je eigen foto.</p>
+      <div class="gallery-grid">
+        <div class="gallery-slot">foto 1</div>
+        <div class="gallery-slot">foto 2</div>
+        <div class="gallery-slot">foto 3</div>
+        <div class="gallery-slot">foto 4</div>
+        <div class="gallery-slot">foto 5</div>
+        <div class="gallery-slot">foto 6</div>
+      </div>
+    </section>
+
+    <section class="reviews">
+      <div class="reviews-header">
+        <h2>het product: "Lana Lievezoons"</h2>
+        <div class="rating-line">
+          <span class="stars">★★★★★</span>
+          <span class="count" id="review-count">gebaseerd op reviews</span>
+        </div>
+        <div class="tagline">vrienden, familie en collega's laten hun ervaring achter</div>
+      </div>
+      <div class="review-grid" id="review-grid"></div>
+    </section>
+
+    <section class="meter-section">
+      <h2>hoeveel hou ik van jou?</h2>
+      <p class="sub">druk op de knop. blijf drukken. kijk wat er gebeurt.</p>
+      <button id="meter-btn">druk hier</button>
+      <div class="meter-bar-track"><div class="meter-bar-fill" id="meter-fill"></div></div>
+      <div class="meter-label" id="meter-label">0%</div>
+    </section>
+
+    <section class="closing">
+      <h2>[Jouw slotboodschap hier — het laatste wat je wil dat ze leest]</h2>
+      <div class="sign">— voor altijd de jouwe</div>
+      <div class="shout">ik hou van Lana Lievezoons, en iedereen mag het weten</div>
+    </section>
+
+  </div>
+
+<script>
+  /* ===================================================================
+     BEWERK HIER DE 27 REDENEN
+     Elk item = 1 kaartje. Vervang de tekst tussen de aanhalingstekens.
+     =================================================================== */
+  const reasons = [
+    "Reden 1 — vul iets echts in",
+    "Reden 2 — een inside joke",
+    "Reden 3 — hoe ze lacht",
+    "Reden 4 — een gewoontetje van haar",
+    "Reden 5 — hoe ze jou doet voelen",
+    "Reden 6 — iets wat ze goed kan",
+    "Reden 7 — een favoriete herinnering",
+    "Reden 8 — iets kleins dat ze altijd doet",
+    "Reden 9 — hoe ze met anderen omgaat",
+    "Reden 10 — iets waar ze goed in is",
+    "Reden 11 — hoe ze jou verrast",
+    "Reden 12 — iets grappigs",
+    "Reden 13 — haar doorzettingsvermogen",
+    "Reden 14 — een reis of moment samen",
+    "Reden 15 — hoe ze naar dingen kijkt",
+    "Reden 16 — iets typisch Lana",
+    "Reden 17 — hoe ze zorgt voor mensen",
+    "Reden 18 — iets wat je aan haar bewondert",
+    "Reden 19 — een klein detail dat je opvalt",
+    "Reden 20 — hoe jullie samen zijn",
+    "Reden 21 — iets wat ze je geleerd heeft",
+    "Reden 22 — haar smaak in muziek/eten/whatever",
+    "Reden 23 — hoe ze een kamer binnenkomt",
+    "Reden 24 — iets wat alleen zij zo doet",
+    "Reden 25 — waarom je haar kiest, elke dag",
+    "Reden 26 — een toekomstplan samen",
+    "Reden 27 — gewoon, omdat ze Lana is"
+  ];
+
+  const reasonGrid = document.getElementById('reason-grid');
+  reasons.forEach((text, i) => {
+    const card = document.createElement('div');
+    card.className = 'reason-card';
+    card.innerHTML = `<span class="num">${i+1} / 27</span><p>${text}</p>`;
+    reasonGrid.appendChild(card);
+  });
+
+  /* ===================================================================
+     BEWERK HIER DE REVIEWS
+     Vraag vrienden/familie om een tekst + naam + rol (bv. "collega",
+     "beste vriendin", "zus"). Voeg gerust meer objecten toe aan de lijst.
+     rating = aantal sterren (meestal 5).
+     =================================================================== */
+  const reviews = [
+    {
+      name: "— naam invullen",
+      badge: "geverifieerde vriend(in)",
+      rating: 5,
+      text: "Lana Lievezoons heeft me geholpen met het vinden van mezelf. Ze weet steeds paraat te staan om te luisteren, samen na te denken, te relativeren en weer door te gaan."
+    },
+    {
+      name: "— naam invullen",
+      badge: "geverifieerde gebruiker",
+      rating: 5,
+      text: "Lana heeft me geleerd dat paarden meer zijn dan een dier — paarden zijn een roeping."
+    },
+    {
+      name: "— naam invullen",
+      badge: "collega",
+      rating: 5,
+      text: "Lana is een fantastische collega. Ik kan haar alleen maar aanbevelen aan iedereen om het zonnetje in jouw bedrijf te worden."
+    }
+    // Voeg hier gerust meer reviews toe, zelfde formaat:
+    // { name: "Naam", badge: "rol", rating: 5, text: "..." },
+  ];
+
+  const reviewGrid = document.getElementById('review-grid');
+  const reviewCount = document.getElementById('review-count');
+  reviewCount.textContent = `gebaseerd op ${reviews.length} review${reviews.length === 1 ? '' : 's'}`;
+
+  reviews.forEach(r => {
+    const card = document.createElement('div');
+    card.className = 'review-card';
+    const initials = r.name.replace(/[^A-Za-zÀ-ÿ]/g, '').slice(0,2).toUpperCase() || '?';
+    card.innerHTML = `
+      <span class="stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span>
+      <p class="text">"${r.text}"</p>
+      <div class="reviewer">
+        <div class="avatar">${initials}</div>
+        <div class="meta">
+          <span class="name">${r.name}</span>
+          <span class="badge">${r.badge}</span>
+        </div>
+      </div>`;
+    reviewGrid.appendChild(card);
+  });
+
+  // extra lege kaart als uitnodiging om er meer toe te voegen
+  const inviteCard = document.createElement('div');
+  inviteCard.className = 'review-card empty';
+  inviteCard.textContent = '+ jouw review hier? vraag het aan vrienden of familie en voeg toe in het bestand';
+  reviewGrid.appendChild(inviteCard);
+
+  /* ===================================================================
+     ENVELOP + CONFETTI
+     =================================================================== */
+  const envelope = document.getElementById('envelope');
+  const envScreen = document.getElementById('envelope-screen');
+  const site = document.getElementById('site');
+  const confettiLayer = document.getElementById('confetti-layer');
+
+  function burstConfetti(){
+    const colors = ['#FF6F5E','#FFD23F','#5EC9C2','#FFD9B3','#3B2A4A'];
+    const count = window.innerWidth < 500 ? 40 : 60;
+    for(let i=0;i<count;i++){
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece';
+      const size = 6 + Math.random()*6;
+      piece.style.width = size+'px';
+      piece.style.height = (size*0.4)+'px';
+      piece.style.left = Math.random()*100+'vw';
+      piece.style.background = colors[Math.floor(Math.random()*colors.length)];
+      piece.style.animationDuration = (2 + Math.random()*1.5)+'s';
+      piece.style.animationDelay = (Math.random()*0.3)+'s';
+      confettiLayer.appendChild(piece);
+      setTimeout(()=>piece.remove(), 4000);
+    }
+  }
+
+  envelope.addEventListener('click', () => {
+    if(envelope.classList.contains('open')) return;
+    envelope.classList.add('open');
+    burstConfetti();
+    setTimeout(() => {
+      envScreen.classList.add('hidden');
+      site.classList.add('visible');
+      window.scrollTo({top:0, behavior:'instant'});
+    }, 750);
+  });
+
+  /* ===================================================================
+     LIEFDESMETER
+     =================================================================== */
+  const meterBtn = document.getElementById('meter-btn');
+  const meterFill = document.getElementById('meter-fill');
+  const meterLabel = document.getElementById('meter-label');
+  let taps = 0;
+  const labels = [
+    [0, "0%"],
+    [15, "een beetje"],
+    [35, "best wel veel"],
+    [60, "heel erg veel"],
+    [85, "een belachelijke hoeveelheid"],
+    [100, "oneindig. de balk kan het niet aan."]
+  ];
+  meterBtn.addEventListener('click', () => {
+    taps++;
+    const pct = Math.min(100, taps*9);
+    meterFill.style.width = pct+'%';
+    let label = "0%";
+    for(const [threshold, text] of labels){ if(pct >= threshold) label = text; }
+    meterLabel.textContent = label;
+    if(pct >= 100){
+      meterBtn.textContent = "zie je wel";
+      meterBtn.disabled = true;
+    }
+  });
+</script>
+
+</body>
+</html>
