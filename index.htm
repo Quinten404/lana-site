@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Voor Lana</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,500;1,600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --peach: #FFD9B3;
+    --coral: #FF6F5E;
+    --sun: #FFD23F;
+    --teal: #5EC9C2;
+    --ink: #3B2A4A;
+    --cream: #FFFCF7;
+  }
+
+  *{ box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html{ -webkit-text-size-adjust: 100%; }
+
+  body{
+    margin:0;
+    font-family: 'Poppins', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    overflow-x: hidden;
+    width: 100%;
+  }
+
+  h1,h2,h3{ font-family: 'Fraunces', serif; margin: 0; }
+
+  /* ============ ENVELOP ============ */
+  #envelope-screen{
+    position: fixed; inset: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, var(--peach), var(--sun) 60%, var(--coral));
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+    padding: 5vw;
+  }
+  #envelope-screen.hidden{ opacity: 0; visibility: hidden; pointer-events: none; }
+
+  .envelope{ position: relative; width: min(340px, 82vw); aspect-ratio: 3/2; cursor: pointer; touch-action: manipulation; }
+  .env-back{ position:absolute; inset:0; background: var(--cream); border-radius: 6px; box-shadow: 0 20px 50px rgba(59,42,74,0.25); }
+  .env-flap{
+    position:absolute; top:0; left:0; right:0; height: 55%;
+    background: var(--coral);
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    transform-origin: top;
+    transition: transform 0.7s cubic-bezier(.7,-0.4,.3,1.4);
+    z-index: 3;
+  }
+  .envelope.open .env-flap{ transform: rotateX(180deg); }
+  .env-label{
+    position:absolute; bottom: 22%; left: 0; right:0; text-align:center;
+    font-family:'Fraunces', serif; font-style: italic;
+    font-size: clamp(1.1rem, 5vw, 1.6rem); color: var(--ink); z-index: 1; padding: 0 1rem;
+  }
+  .seal{
+    position:absolute; top: 50%; left:50%; transform: translate(-50%,-50%);
+    width: 60px; height:60px; background: var(--ink); border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    color: var(--sun); font-family:'Fraunces', serif; font-weight:700; font-size: 1.4rem;
+    z-index: 4; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: transform 0.3s ease;
+  }
+  .envelope:hover .seal{ transform: translate(-50%,-50%) scale(1.08); }
+  .envelope.open .seal{ animation: pop-seal 0.5s forwards; }
+  @keyframes pop-seal{ to{ opacity:0; transform: translate(-50%,-50%) scale(0.3); } }
+
+  .envelope-hint{ position:absolute; bottom: -46px; left:0; right:0; text-align:center; font-size:0.85rem; color: var(--ink); opacity:0.7; }
+
+  #confetti-layer{ position:fixed; inset:0; pointer-events:none; z-index: 99; overflow:hidden; }
+  .confetti-piece{ position:absolute; top:-10px; border-radius:2px; opacity:0.9; animation: fall linear forwards; }
+  @keyframes fall{ to{ transform: translateY(110vh) rotate(540deg); opacity:0.3; } }
+
+  /* ============ SITE ============ */
+  #site{ opacity:0; transition: opacity 1s ease 0.3s; width:100%; overflow-x: hidden; }
+  #site.visible{ opacity:1; }
+
+  /* MUZIEK KNOP */
+  #mute-btn{
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    z-index: 150;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    background: var(--cream);
+    box-shadow: 0 4px 14px rgba(59,42,74,0.2);
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s ease;
+  }
+  #mute-btn.visible{ display: flex; }
+  #mute-btn:active{ transform: scale(0.92); }
+
+  section{ padding: 5rem 6vw; max-width: 1100px; margin: 0 auto; }
+  @media (max-width: 600px){ section{ padding: 3.5rem 6vw; } }
+
+  /* HERO */
+  .hero{ text-align:center; padding-top: 7rem; }
+  @media (max-width:600px){ .hero{ padding-top: 5rem; } }
+  .hero .eyebrow{ font-size:0.85rem; letter-spacing:0.15em; text-transform:uppercase; color: var(--coral); font-weight:600; }
+  .hero h1{ font-size: clamp(2.2rem, 10vw, 5rem); font-weight:600; margin: 0.5rem 0 1rem; line-height:1.05; word-wrap: break-word; }
+  .hero h1 em{ color: var(--coral); font-style: italic; }
+  .hero p{ font-size: clamp(1rem, 3.5vw, 1.15rem); max-width:520px; margin: 0 auto; opacity:0.85; }
+  .hero .big-number{
+    font-family:'Fraunces', serif;
+    font-size: clamp(4rem, 22vw, 8rem);
+    color: var(--coral);
+    line-height: 0.9;
+    margin: 1.5rem 0 0;
+    font-weight: 700;
+  }
+  .hero .big-number-label{ font-size:0.9rem; opacity:0.6; letter-spacing:0.1em; text-transform:uppercase; }
+  .hero .doodle{ font-size:2.5rem; margin-top:1.5rem; animation: bob 2.4s ease-in-out infinite; }
+  @keyframes bob{ 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-10px); } }
+
+  /* REDENEN */
+  .reasons h2{ font-size: clamp(1.6rem,6vw,2.6rem); text-align:center; margin-bottom: 0.5rem; }
+  .reasons h2 span{ color: var(--teal); font-style:italic; }
+  .reasons .sub{ text-align:center; opacity:0.7; font-size:0.9rem; margin-bottom: 2.5rem; }
+
+  .reason-grid{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+  @media (max-width: 800px){ .reason-grid{ grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 460px){ .reason-grid{ grid-template-columns: 1fr; } }
+
+  .reason-card{
+    background: white;
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+    box-shadow: 0 6px 18px rgba(59,42,74,0.1);
+    position: relative;
+    transition: transform 0.2s ease;
+  }
+  .reason-card:hover{ transform: translateY(-3px); }
+  .reason-card .num{
+    font-family:'Fraunces', serif;
+    font-style: italic;
+    font-size: 0.8rem;
+    color: var(--coral);
+    display:block;
+    margin-bottom: 0.35rem;
+  }
+  .reason-card p{ margin:0; font-size:0.95rem; line-height:1.4; }
+
+  /* GALERIJ */
+  .gallery h2{ font-size: clamp(1.6rem,6vw,2.6rem); text-align:center; margin-bottom:1rem; }
+  .gallery .note{ text-align:center; opacity:0.7; font-size:0.85rem; margin-bottom:2rem; padding: 0 2vw; }
+  .gallery-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 0.8rem; }
+  .gallery-slot{
+    aspect-ratio: 1/1;
+    border-radius: 10px;
+    object-fit: cover;
+    width: 100%;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 14px rgba(59,42,74,0.12);
+  }
+  .gallery-slot:hover{
+    transform: scale(1.03);
+    box-shadow: 0 8px 22px rgba(59,42,74,0.22);
+  }
+
+  /* LIGHTBOX */
+  #lightbox{
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(59,42,74,0.92);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 5vw;
+    cursor: zoom-out;
+  }
+  #lightbox.open{ display: flex; }
+  #lightbox-img{
+    max-width: 100%;
+    max-height: 85vh;
+    border-radius: 8px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    cursor: default;
+  }
+  #lightbox-close{
+    position: absolute;
+    top: 20px;
+    right: 28px;
+    font-size: 2.4rem;
+    color: var(--cream);
+    cursor: pointer;
+    line-height: 1;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+  }
+  #lightbox-close:hover{ opacity: 1; }
+
+  .lightbox-arrow{
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 2.4rem;
+    color: var(--cream);
+    cursor: pointer;
+    line-height: 1;
+    opacity: 0.75;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    padding: 0.6rem 0.8rem;
+    user-select: none;
+  }
+  .lightbox-arrow:hover{ opacity: 1; }
+  #lightbox-prev{ left: 10px; }
+  #lightbox-next{ right: 10px; }
+
+  @media (max-width: 600px){
+    .lightbox-arrow{ font-size: 2rem; padding: 0.5rem 0.6rem; }
+    #lightbox-close{ top: 12px; right: 16px; font-size: 2rem; }
+  }
+
+  #lightbox-counter{
+    position: absolute;
+    bottom: 18px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: var(--cream);
+    opacity: 0.6;
+    font-size: 0.85rem;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  /* REVIEWS */
+  .reviews{ background: var(--peach); border-radius: 24px; }
+  .reviews-header{ text-align:center; margin-bottom: 2.5rem; }
+  .reviews-header h2{ font-size: clamp(1.6rem,6vw,2.6rem); }
+  .reviews-header .rating-line{
+    margin-top: 0.8rem;
+    font-size: 1rem;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .stars{ color: var(--coral); letter-spacing: 2px; font-size: 1.1rem; }
+  .reviews-header .count{ opacity:0.7; font-size:0.9rem; }
+  .reviews-header .tagline{ margin-top:0.6rem; font-size:0.85rem; opacity:0.65; font-style: italic; }
+
+  .review-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.2rem;
+  }
+  .review-card{
+    background: var(--cream);
+    border-radius: 12px;
+    padding: 1.3rem 1.4rem;
+    box-shadow: 0 6px 18px rgba(59,42,74,0.08);
+  }
+  .review-card .stars{ margin-bottom: 0.5rem; display:block; }
+  .review-card p.text{ font-size:0.92rem; line-height:1.5; margin: 0 0 0.9rem; }
+  .review-card .reviewer{
+    display:flex; align-items:center; gap: 0.6rem;
+    font-size:0.85rem;
+  }
+  .review-card .avatar{
+    width: 32px; height:32px; border-radius:50%;
+    background: var(--teal);
+    color: white;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Fraunces', serif; font-weight:700; font-size:0.85rem;
+    flex-shrink:0;
+  }
+  .review-card .meta{ display:flex; flex-direction:column; }
+  .review-card .meta .name{ font-weight:600; }
+  .review-card .meta .badge{ font-size:0.72rem; opacity:0.6; }
+  .review-card.empty{
+    border: 2px dashed rgba(59,42,74,0.25);
+    background: transparent;
+    box-shadow:none;
+    display:flex; align-items:center; justify-content:center;
+    text-align:center;
+    font-size:0.85rem;
+    opacity:0.6;
+    min-height: 140px;
+  }
+
+  /* METER */
+  .meter-section{ text-align:center; }
+  .meter-section h2{ font-size: clamp(1.4rem,6vw,2.3rem); margin-bottom: 0.5rem; }
+  .meter-section p.sub{ opacity:0.75; margin-bottom:2rem; font-size: clamp(0.85rem,3vw,1rem); padding: 0 2vw;}
+  #meter-btn{
+    font-family:'Poppins', sans-serif; font-weight:600; font-size:1rem;
+    padding: 0.9rem 2rem; border-radius: 999px; border:none;
+    background: var(--coral); color: white; cursor:pointer;
+    box-shadow: 0 8px 20px rgba(255,111,94,0.4);
+    transition: transform 0.15s ease; touch-action: manipulation;
+  }
+  #meter-btn:active{ transform: scale(0.95); }
+  .meter-bar-track{ max-width: 480px; margin: 2rem auto 0.5rem; height: 20px; background: rgba(59,42,74,0.1); border-radius: 999px; overflow:hidden; }
+  .meter-bar-fill{ height:100%; width:0%; background: linear-gradient(90deg, var(--sun), var(--coral)); border-radius:999px; transition: width 0.4s ease; }
+  .meter-label{ font-family:'Fraunces', serif; font-style:italic; font-size: clamp(0.95rem,3.5vw,1.1rem); padding: 0 3vw; }
+
+  /* AFSLUITER */
+  .closing{ text-align:center; padding-bottom: 6rem; }
+  .closing h2{ font-size: clamp(1.7rem,7vw,3.2rem); font-style: italic; max-width: 600px; margin: 0 auto 1rem; line-height:1.25; }
+  .closing .sign{ margin-top:2rem; font-family:'Fraunces', serif; font-style:italic; font-size: clamp(1.1rem,4vw,1.3rem); color: var(--coral); }
+  .closing .shout{ margin-top: 3rem; font-family:'Poppins', sans-serif; font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.5; }
+
+  /* FOOTER */
+  .site-footer{
+    text-align: center;
+    padding: 2rem 6vw 3rem;
+    font-size: 0.8rem;
+    opacity: 0.55;
+  }
+  .maker-link{
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 3px;
+    transition: opacity 0.2s ease;
+  }
+  .maker-link:hover{ opacity: 0.7; }
+
+  @media (prefers-reduced-motion: reduce){
+    .hero .doodle{ animation:none; }
+    .confetti-piece{ animation:none; display:none; }
+  }
+</style>
+</head>
+<body>
+
+  <div id="envelope-screen">
+    <div class="envelope" id="envelope">
+      <div class="env-back"></div>
+      <div class="env-label">Lana Lievezoons fan page</div>
+      <div class="env-flap"></div>
+      <div class="seal">L</div>
+      <div class="envelope-hint">klik om me te openen</div>
+    </div>
+  </div>
+  <div id="confetti-layer"></div>
+
+  <audio id="bg-music" src="audio/verjaardagwebsite.mp3" loop></audio>
+  <button id="mute-btn" title="geluid aan/uit">🔊</button>
+
+  <div id="site">
+
+    <section class="hero">
+      <div class="eyebrow">Een website voor de toekomst?</div>
+      <h1>Dag, <em>Lanabeer</em>.</h1>
+      <p>Jij slaagt er in om elke dag van ons leven rijker, mooier, grappiger en gewoon 1000 maal beter te maken.</p>
+      <div class="big-number">27</div>
+      <div class="big-number-label">redenen waarom ik van je hou</div>
+      <div class="doodle">💛</div>
+    </section>
+
+    <section class="reasons">
+      <h2>27 redenen, <span>omdat je nu 27 geworden bent</span></h2>
+      <p class="sub">Hier zijn 27 redenen waarom Lana Lievezoons de beste persoon op aarde is*</p><br>
+      <p class="sub">*=volgens Quinten Vanagt (en Piraat)</p>
+      <div class="reason-grid" id="reason-grid"></div>
+    </section>
+
+    <section class="gallery">
+      <h2>Lana, in foto's</h2>
+      <p class="note"></p>
+      <div class="gallery-grid">
+       <img class="gallery-slot" src="images/1.JPG" alt="foto 1">
+        <img class="gallery-slot" src="images/2.JPG" alt="foto 2">
+        <img class="gallery-slot" src="images/3.JPG" alt="foto 3">
+        <img class="gallery-slot" src="images/4.JPG" alt="foto 4">
+        <img class="gallery-slot" src="images/5.JPG" alt="foto 5">
+        <img class="gallery-slot" src="images/6.JPG" alt="foto 6">
+        <img class="gallery-slot" src="images/7.JPG" alt="foto 7">
+        <img class="gallery-slot" src="images/8.JPG" alt="foto 8">
+        <img class="gallery-slot" src="images/9.JPG" alt="foto 9">
+        <img class="gallery-slot" src="images/10.JPG" alt="foto 10">
+        <img class="gallery-slot" src="images/11.JPG" alt="foto 11">
+        <img class="gallery-slot" src="images/12.JPG" alt="foto 12">
+        <img class="gallery-slot" src="images/13.JPG" alt="foto 13">
+        <img class="gallery-slot" src="images/14.JPG" alt="foto 14">
+        <img class="gallery-slot" src="images/15.JPG" alt="foto 15">
+        <img class="gallery-slot" src="images/16.JPG" alt="foto 16">
+        <img class="gallery-slot" src="images/17.JPG" alt="foto 17">
+        <img class="gallery-slot" src="images/18.JPG" alt="foto 18">
+        <img class="gallery-slot" src="images/19.JPG" alt="foto 19">
+        <img class="gallery-slot" src="images/20.JPG" alt="foto 20">
+        <img class="gallery-slot" src="images/21.JPG" alt="foto 21">
+        <img class="gallery-slot" src="images/22.JPG" alt="foto 22">
+        <img class="gallery-slot" src="images/23.JPG" alt="foto 23">
+        <img class="gallery-slot" src="images/24.JPG" alt="foto 24">
+        <img class="gallery-slot" src="images/25.JPG" alt="foto 25">
+        <img class="gallery-slot" src="images/26.JPG" alt="foto 26">
+        <img class="gallery-slot" src="images/27.JPG" alt="foto 27">
+      </div>
+    </section>
+
+    <div id="lightbox">
+      <span id="lightbox-close">&times;</span>
+      <span class="lightbox-arrow" id="lightbox-prev">&#8249;</span>
+      <img id="lightbox-img" src="" alt="">
+      <span class="lightbox-arrow" id="lightbox-next">&#8250;</span>
+      <div id="lightbox-counter"></div>
+    </div>
+
+
+    <section class="reviews">
+      <div class="reviews-header">
+        <h2>"Lana Lievezoons"</h2>
+        <div class="rating-line">
+          <span class="stars">★★★★★</span>
+          <span class="count" id="review-count">gebaseerd op talrijke reviews</span>
+        </div>
+        <div class="tagline">vrienden, familie en collega's laten hun ervaring achter</div>
+      </div>
+      <div class="review-grid" id="review-grid"></div>
+    </section>
+
+    <section class="meter-section">
+      <h2>hoeveel hou ik van jou?</h2>
+      <p class="sub">druk op de knop. blijf drukken. kijk wat er gebeurt.</p>
+      <button id="meter-btn">druk hier</button>
+      <div class="meter-bar-track"><div class="meter-bar-fill" id="meter-fill"></div></div>
+      <div class="meter-label" id="meter-label">0%</div>
+    </section>
+
+    <section class="closing">
+      <h2>Beschouw deze website als het begin van een nieuw hoofdstuk.</h2>
+      <div class="sign">— voor altijd de jouwe</div>
+      <div class="shout">ik hou van Lana Lievezoons, en iedereen mag het weten</div>
+    </section>
+
+    <footer class="site-footer">
+        <p>Website gecodeerd door <span class="maker-link" id="maker-link">Pirata Peperbol BVBA</span></p>
+      </footer>
+  </div>
+
+<script>
+  /* ===================================================================
+     BEWERK HIER DE 27 REDENEN
+     Elk itemaker = 1 kaartje. Vervang de tekst tussen de aanhalingstekens.
+     =================================================================== */
+  const reasons = [
+    "Lana is de allerknapste vrouw die ik ken. No doubt!",
+    "Er is niemand die sociaal wenselijker gedrag vertoont dan haar.",
+    "Lana kan eender wie doen lachen.",
+    "Lana ziet het mooiste in elke mens. Niemand is stom of dom volgens Lana.",
+    "We need more Lana's!",
+    "Lana is ongelooflijk goed in heerlijk koken. Heeft ze het van Annbeer? Niemand die het weet.",
+    "Ik ben Lana enorm dankbaar dat ze samen met mij voor Pirata hebben gekozen.",
+    "Lana houdt van paarden maar ik heb me laten vertellen dat de paarden zelfs nog meer van Lana houden.",
+    "Lana is ongeloofelijk zorgzaam en empatisch. Empatisch is feitelijk het tegenovergestelde van apathie.",
+    "Lana is waanzinnig goed in het ontvangen van massages en rugkrabbels.",
+    "Lana is volgens recente peilingen officieel de grappigste persoon van Limburg.* *=peiling uitgevoerd door Het Belang Van Limburg op 21/08/2026",
+    "In Frituur Pommz is de naam Lana een begrip. When you say Lana... We say: 1 veggie bicky, veggie kipcorn en een kleintje met satekruiden en Joppiesaus",
+    "Als Lana iets wil, dan zal niemand Lana tegenhouden om dat te krijgen",
+    "Ik zou met niemand anders dan Lana 3 maand lang hebben kunnen of willen rondreizen. Het was een van de mooiste ervaringen uit mijn leven en dat besef druppelt langzaam maar gestaag binnen.",
+    "Met Lana in jouw landbouwbedrijf heb je gegarandeerd een monsteroogst (zeker wat betreft preiproductie).",
+    "Ik bewonder Lana omdat ze elke dag de energie vindt om met mij om te gaan. Dankuu.",
+    "Ik voel me zo geliefd, dag na dag. Ik hoop dat ik haar dat evenveel teruggeef.",
+    "Lana wilt de wereld tonen dat 'gewoon een beetje zijn' het beste is wat er is. Quinten is alvast overtuigd!",
+    "Lana kan eender welke stadsjongen overtuigen om een leven met haar te beginnen in Limburg, in de natuur, met dieren, met liefde, met appels en met woonwagens.",
+    "Lana kan steeds maar weer een nieuw leuk album of nummer vinden om naar te luisteren. Flo is er niets mee vergeleken",
+    "Als Lana de ruimte binnenkomt, stijgt de sfeer gemiddeld +27%.",
+    "Lana kan goed luisteren maar ook advies geven als het even niet meer lukt of je het niet ziet zitten. Ze ziet steeds het beste in de mensen rondom haar. Ik wens haar toe dat ze dat ook bij zichzelf toepast.",
+    "Er is niemand anders waar ik elke dag opnieuw voor zou willen vechten.",
+    "Er is niemand die even goed haar nek kapot kan maken op de dansvloer. Show us girl! Pukkelpop here we come",
+    "Gewoon omdat ze Lana is.",
+    "[nog eentje invullen — bijna aan 27]",
+    "[laatste plekje — vul de allerlaatste reden hier in]"
+  ];
+
+  const reasonGrid = document.getElementById('reason-grid');
+  reasons.forEach((text, i) => {
+    const card = document.createElement('div');
+    card.className = 'reason-card';
+    card.innerHTML = `<span class="num">${i+1} / 27</span><p>${text}</p>`;
+    reasonGrid.appendChild(card);
+  });
+
+  /* ===================================================================
+     BEWERK HIER DE REVIEWS
+     Vraag vrienden/familie om een tekst + naam + rol (bv. "collega",
+     "beste vriendin", "zus"). Voeg gerust meer objecten toe aan de lijst.
+     rating = aantal sterren (meestal 5).
+     =================================================================== */
+  const reviews = [
+    {
+      name: "Anonieme Boer",
+      badge: "gekend bij de redactie",
+      rating: 5,
+      text: "Je kunt de boerin uit Limburg halen, maar de boerin uit de Limburger krijgen... Dat niet. Lana dat is boerinnenpower all the way."
+    },
+    {
+      name: "— naam invullen",
+      badge: "geverifieerde gebruiker",
+      rating: 5,
+      text: "Lana heeft me geleerd dat paarden meer zijn dan een dier — paarden zijn een roeping."
+    },
+    {
+      name: "— naam invullen",
+      badge: "collega",
+      rating: 5,
+      text: "Lana is een fantastische collega. Ik kan haar alleen maar aanbevelen aan iedereen om het zonnetje in jouw bedrijf te worden."
+    }
+    // Voeg hier gerust meer reviews toe, zelfde formaat:
+    // { name: "Naam", badge: "rol", rating: 5, text: "..." },
+  ];
+
+  const reviewGrid = document.getElementById('review-grid');
+  const reviewCount = document.getElementById('review-count');
+  reviewCount.textContent = `gebaseerd op ${reviews.length} review${reviews.length === 1 ? '' : 's'}`;
+
+  reviews.forEach(r => {
+    const card = document.createElement('div');
+    card.className = 'review-card';
+    const initials = r.name.replace(/[^A-Za-zÀ-ÿ]/g, '').slice(0,2).toUpperCase() || '?';
+    card.innerHTML = `
+      <span class="stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span>
+      <p class="text">"${r.text}"</p>
+      <div class="reviewer">
+        <div class="avatar">${initials}</div>
+        <div class="meta">
+          <span class="name">${r.name}</span>
+          <span class="badge">${r.badge}</span>
+        </div>
+      </div>`;
+    reviewGrid.appendChild(card);
+  });
+
+  // extra lege kaart als uitnodiging om er meer toe te voegen
+  const inviteCard = document.createElement('div');
+  inviteCard.className = 'review-card empty';
+  inviteCard.textContent = '+ jouw review hier? vraag het aan vrienden of familie en voeg toe in het bestand';
+  reviewGrid.appendChild(inviteCard);
+
+  /* ===================================================================
+     FOTO LIGHTBOX (met vorige/volgende + swipe)
+     =================================================================== */
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightbox-img');
+  const lightboxClose = document.getElementById('lightbox-close');
+  const lightboxPrev = document.getElementById('lightbox-prev');
+  const lightboxNext = document.getElementById('lightbox-next');
+  const lightboxCounter = document.getElementById('lightbox-counter');
+
+  const galleryImgs = Array.from(document.querySelectorAll('.gallery-slot'));
+  let currentIndex = -1; // -1 betekent: geen galerijfoto actief (bv. de maker-foto)
+
+  function showImage(index){
+    if(galleryImgs.length === 0) return;
+    currentIndex = (index + galleryImgs.length) % galleryImgs.length;
+    const img = galleryImgs[currentIndex];
+    lightboxImg.src = img.src;
+    lightboxImg.alt = img.alt;
+    lightboxCounter.textContent = `${currentIndex + 1} / ${galleryImgs.length}`;
+    lightboxCounter.style.display = 'block';
+    lightboxPrev.style.display = 'block';
+    lightboxNext.style.display = 'block';
+    lightbox.classList.add('open');
+  }
+
+  galleryImgs.forEach((img, i) => {
+    img.addEventListener('click', () => showImage(i));
+  });
+
+  function showNext(){ showImage(currentIndex + 1); }
+  function showPrev(){ showImage(currentIndex - 1); }
+
+  lightboxNext.addEventListener('click', (e) => { e.stopPropagation(); showNext(); });
+  lightboxPrev.addEventListener('click', (e) => { e.stopPropagation(); showPrev(); });
+
+  // footer: klik op de naam van de maker toont zijn foto (geen vorige/volgende hierbij)
+  const makerLink = document.getElementById('maker-link');
+  makerLink.addEventListener('click', () => {
+    currentIndex = -1;
+    lightboxImg.src = 'images/Pirata.JPG';
+    lightboxImg.alt = 'De maker van deze website';
+    lightboxCounter.style.display = 'none';
+    lightboxPrev.style.display = 'none';
+    lightboxNext.style.display = 'none';
+    lightbox.classList.add('open');
+  });
+
+  function closeLightbox(){ lightbox.classList.remove('open'); }
+  lightboxClose.addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', (e) => {
+    if(e.target === lightbox) closeLightbox();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if(!lightbox.classList.contains('open')) return;
+    if(e.key === 'Escape') closeLightbox();
+    if(e.key === 'ArrowRight' && currentIndex !== -1) showNext();
+    if(e.key === 'ArrowLeft' && currentIndex !== -1) showPrev();
+  });
+
+  // swipe-ondersteuning voor mobiel
+  let touchStartX = 0;
+  let touchEndX = 0;
+  lightbox.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+  lightbox.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    const diff = touchEndX - touchStartX;
+    if(Math.abs(diff) < 40 || currentIndex === -1) return; // te kleine beweging = geen swipe
+    if(diff < 0) showNext(); else showPrev();
+  }, { passive: true });
+
+  /* ===================================================================
+     ENVELOP + CONFETTI
+     =================================================================== */
+  const envelope = document.getElementById('envelope');
+  const envScreen = document.getElementById('envelope-screen');
+  const site = document.getElementById('site');
+  const confettiLayer = document.getElementById('confetti-layer');
+
+  function burstConfetti(){
+    const colors = ['#FF6F5E','#FFD23F','#5EC9C2','#FFD9B3','#3B2A4A'];
+    const count = window.innerWidth < 500 ? 40 : 60;
+    for(let i=0;i<count;i++){
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece';
+      const size = 6 + Math.random()*6;
+      piece.style.width = size+'px';
+      piece.style.height = (size*0.4)+'px';
+      piece.style.left = Math.random()*100+'vw';
+      piece.style.background = colors[Math.floor(Math.random()*colors.length)];
+      piece.style.animationDuration = (2 + Math.random()*1.5)+'s';
+      piece.style.animationDelay = (Math.random()*0.3)+'s';
+      confettiLayer.appendChild(piece);
+      setTimeout(()=>piece.remove(), 4000);
+    }
+  }
+
+  /* ===================================================================
+     MUZIEK AAN/UIT
+     =================================================================== */
+  const bgMusic = document.getElementById('bg-music');
+  const muteBtn = document.getElementById('mute-btn');
+  muteBtn.addEventListener('click', () => {
+    if(bgMusic.muted){
+      bgMusic.muted = false;
+      muteBtn.textContent = '🔊';
+    } else {
+      bgMusic.muted = true;
+      muteBtn.textContent = '🔇';
+    }
+  });
+
+  envelope.addEventListener('click', () => {
+    if(envelope.classList.contains('open')) return;
+    envelope.classList.add('open');
+    burstConfetti();
+    bgMusic.play().catch(() => { /* als afspelen mislukt, blijft de knop gewoon werken */ });
+    muteBtn.classList.add('visible');
+    setTimeout(() => {
+      envScreen.classList.add('hidden');
+      site.classList.add('visible');
+      window.scrollTo({top:0, behavior:'instant'});
+    }, 750);
+  });
+
+  /* ===================================================================
+     LIEFDESMETER
+     =================================================================== */
+  const meterBtn = document.getElementById('meter-btn');
+  const meterFill = document.getElementById('meter-fill');
+  const meterLabel = document.getElementById('meter-label');
+  let taps = 0;
+  const labels = [
+    [0, "0%"],
+    [15, "een beetje"],
+    [35, "best wel veel"],
+    [60, "heel erg veel"],
+    [85, "een belachelijke hoeveelheid"],
+    [100, "oneindig. de balk kan het niet aan."]
+  ];
+  meterBtn.addEventListener('click', () => {
+    taps++;
+    const pct = Math.min(100, taps*9);
+    meterFill.style.width = pct+'%';
+    let label = "0%";
+    for(const [threshold, text] of labels){ if(pct >= threshold) label = text; }
+    meterLabel.textContent = label;
+    if(pct >= 100){
+      meterBtn.textContent = "zie je wel";
+      meterBtn.disabled = true;
+    }
+  });
+</script>
+
+</body>
+</html>
