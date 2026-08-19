@@ -136,10 +136,51 @@
   .gallery .note{ text-align:center; opacity:0.7; font-size:0.85rem; margin-bottom:2rem; padding: 0 2vw; }
   .gallery-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 0.8rem; }
   .gallery-slot{
-    aspect-ratio: 1/1; border-radius: 10px; display:flex; align-items:center; justify-content:center;
-    font-size:0.8rem; color: rgba(59,42,74,0.5); text-align:center; padding: 0.5rem;
-    border: 2px dashed rgba(59,42,74,0.25);
+    aspect-ratio: 1/1;
+    border-radius: 10px;
+    object-fit: cover;
+    width: 100%;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 14px rgba(59,42,74,0.12);
   }
+  .gallery-slot:hover{
+    transform: scale(1.03);
+    box-shadow: 0 8px 22px rgba(59,42,74,0.22);
+  }
+
+  /* LIGHTBOX */
+  #lightbox{
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(59,42,74,0.92);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 5vw;
+    cursor: zoom-out;
+  }
+  #lightbox.open{ display: flex; }
+  #lightbox-img{
+    max-width: 100%;
+    max-height: 85vh;
+    border-radius: 8px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    cursor: default;
+  }
+  #lightbox-close{
+    position: absolute;
+    top: 20px;
+    right: 28px;
+    font-size: 2.4rem;
+    color: var(--cream);
+    cursor: pointer;
+    line-height: 1;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+  }
+  #lightbox-close:hover{ opacity: 1; }
 
   /* REVIEWS */
   .reviews{ background: var(--peach); border-radius: 24px; }
@@ -219,6 +260,22 @@
   .closing .sign{ margin-top:2rem; font-family:'Fraunces', serif; font-style:italic; font-size: clamp(1.1rem,4vw,1.3rem); color: var(--coral); }
   .closing .shout{ margin-top: 3rem; font-family:'Poppins', sans-serif; font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.5; }
 
+  /* FOOTER */
+  .site-footer{
+    text-align: center;
+    padding: 2rem 6vw 3rem;
+    font-size: 0.8rem;
+    opacity: 0.55;
+  }
+  .maker-link{
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 3px;
+    transition: opacity 0.2s ease;
+  }
+  .maker-link:hover{ opacity: 0.7; }
+
   @media (prefers-reduced-motion: reduce){
     .hero .doodle{ animation:none; }
     .confetti-piece{ animation:none; display:none; }
@@ -230,10 +287,10 @@
   <div id="envelope-screen">
     <div class="envelope" id="envelope">
       <div class="env-back"></div>
-      <div class="env-label">voor Lana</div>
+      <div class="env-label">Lana Lievezoons fan page</div>
       <div class="env-flap"></div>
       <div class="seal">L</div>
-      <div class="envelope-hint">tik om te openen</div>
+      <div class="envelope-hint">klik om me te openen</div>
     </div>
   </div>
   <div id="confetti-layer"></div>
@@ -241,39 +298,47 @@
   <div id="site">
 
     <section class="hero">
-      <div class="eyebrow">een klein verrassinkje</div>
-      <h1>Hoi, <em>Lana</em>.</h1>
-      <p>Jij slaagt er in om elke dag van mijn leven rijker, mooier, grappiger en gewoon 1000 maal beter te maken.</p>
+      <div class="eyebrow">Een website voor de toekomst?</div>
+      <h1>Dag, <em>Lanabeer</em>.</h1>
+      <p>Jij slaagt er in om elke dag van ons leven rijker, mooier, grappiger en gewoon 1000 maal beter te maken.</p>
       <div class="big-number">27</div>
-      <div class="big-number-label">redenen om van jou te houden</div>
+      <div class="big-number-label">redenen waarom ik van je hou</div>
       <div class="doodle">💛</div>
     </section>
 
     <section class="reasons">
-      <h2>27 redenen, <span>op haar 27e</span></h2>
-      <p class="sub">tijd om eens stil te staan bij wie de persoon is die dit allemaal doet — hier zijn 27 redenen waarom Lana Lievezoons de beste persoon op aarde is</p>
+      <h2>27 redenen, <span>omdat je nu 27 geworden bent</span></h2>
+      <p class="sub">Hier zijn 27 redenen waarom Lana Lievezoons de beste persoon op aarde is*</p><br>
+      <p class="sub">*=volgens Quinten Vanagt (en Piraat)</p>
       <div class="reason-grid" id="reason-grid"></div>
     </section>
 
     <section class="gallery">
-      <h2>wij, in foto's</h2>
-      <p class="note">Vervang elk vak hieronder door een &lt;img&gt;-tag met je eigen foto.</p>
+      <h2>Lana, in foto's</h2>
+      <p class="note"></p>
       <div class="gallery-grid">
-        <div class="gallery-slot">foto 1</div>
-        <div class="gallery-slot">foto 2</div>
-        <div class="gallery-slot">foto 3</div>
-        <div class="gallery-slot">foto 4</div>
-        <div class="gallery-slot">foto 5</div>
-        <div class="gallery-slot">foto 6</div>
+        <img class="gallery-slot" src="images/1.JPG" alt="foto 1">
+        <img class="gallery-slot" src="images/2.JPG" alt="foto 2">
+        <img class="gallery-slot" src="images/33.JPG" alt="foto 3">
+        <img class="gallery-slot" src="images/4.JPG" alt="foto 4">
+        <img class="gallery-slot" src="images/5.JPG" alt="foto 5">
+        <img class="gallery-slot" src="images/6.JPG" alt="foto 6">
+        <img class="gallery-slot" src="images/7.JPG" alt="foto 6">
       </div>
     </section>
 
+    <div id="lightbox">
+      <span id="lightbox-close">&times;</span>
+      <img id="lightbox-img" src="" alt="">
+    </div>
+
+
     <section class="reviews">
       <div class="reviews-header">
-        <h2>het product: "Lana Lievezoons"</h2>
+        <h2>"Lana Lievezoons"</h2>
         <div class="rating-line">
           <span class="stars">★★★★★</span>
-          <span class="count" id="review-count">gebaseerd op reviews</span>
+          <span class="count" id="review-count">gebaseerd op talrijke reviews</span>
         </div>
         <div class="tagline">vrienden, familie en collega's laten hun ervaring achter</div>
       </div>
@@ -289,17 +354,20 @@
     </section>
 
     <section class="closing">
-      <h2>[Jouw slotboodschap hier — het laatste wat je wil dat ze leest]</h2>
+      <h2>Beschouw deze website als het begin van een nieuw hoofdstuk.</h2>
       <div class="sign">— voor altijd de jouwe</div>
       <div class="shout">ik hou van Lana Lievezoons, en iedereen mag het weten</div>
     </section>
 
+    <footer class="site-footer">
+        <p>Website gecodeerd door <span class="maker-link" id="maker-link">Pirata Peperbol BVBA</span></p>
+      </footer>
   </div>
 
 <script>
   /* ===================================================================
      BEWERK HIER DE 27 REDENEN
-     Elk item = 1 kaartje. Vervang de tekst tussen de aanhalingstekens.
+     Elk itemaker = 1 kaartje. Vervang de tekst tussen de aanhalingstekens.
      =================================================================== */
   const reasons = [
     "Lana is de allerknapste vrouw die ik ken.",
@@ -347,10 +415,10 @@
      =================================================================== */
   const reviews = [
     {
-      name: "— naam invullen",
-      badge: "geverifieerde vriend(in)",
+      name: "Anonieme Boer",
+      badge: "gekend bij de redactie",
       rating: 5,
-      text: "Lana Lievezoons heeft me geholpen met het vinden van mezelf. Ze weet steeds paraat te staan om te luisteren, samen na te denken, te relativeren en weer door te gaan."
+      text: "Je kunt de boerin uit Limburg halen, maar de boerin uit de Limburger krijgen... Dat niet. Lana dat is boerinnenpower all the way."
     },
     {
       name: "— naam invullen",
@@ -394,6 +462,38 @@
   inviteCard.className = 'review-card empty';
   inviteCard.textContent = '+ jouw review hier? vraag het aan vrienden of familie en voeg toe in het bestand';
   reviewGrid.appendChild(inviteCard);
+
+  /* ===================================================================
+     FOTO LIGHTBOX
+     =================================================================== */
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightbox-img');
+  const lightboxClose = document.getElementById('lightbox-close');
+
+  document.querySelectorAll('.gallery-slot').forEach(img => {
+    img.addEventListener('click', () => {
+      lightboxImg.src = img.src;
+      lightboxImg.alt = img.alt;
+      lightbox.classList.add('open');
+    });
+  });
+
+  // footer: klik op de naam van de maker toont zijn foto
+  const makerLink = document.getElementById('maker-link');
+  makerLink.addEventListener('click', () => {
+    lightboxImg.src = 'images/Pirata.JPG';
+    lightboxImg.alt = 'De maker van deze website';
+    lightbox.classList.add('open');
+  });
+
+  function closeLightbox(){ lightbox.classList.remove('open'); }
+  lightboxClose.addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', (e) => {
+    if(e.target === lightbox) closeLightbox();
+  });
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape') closeLightbox();
+  });
 
   /* ===================================================================
      ENVELOP + CONFETTI
