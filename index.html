@@ -77,6 +77,28 @@
   #site{ opacity:0; transition: opacity 1s ease 0.3s; width:100%; overflow-x: hidden; }
   #site.visible{ opacity:1; }
 
+  /* MUZIEK KNOP */
+  #mute-btn{
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    z-index: 150;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    background: var(--cream);
+    box-shadow: 0 4px 14px rgba(59,42,74,0.2);
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s ease;
+  }
+  #mute-btn.visible{ display: flex; }
+  #mute-btn:active{ transform: scale(0.92); }
+
   section{ padding: 5rem 6vw; max-width: 1100px; margin: 0 auto; }
   @media (max-width: 600px){ section{ padding: 3.5rem 6vw; } }
 
@@ -181,6 +203,40 @@
     transition: opacity 0.2s ease;
   }
   #lightbox-close:hover{ opacity: 1; }
+
+  .lightbox-arrow{
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 2.4rem;
+    color: var(--cream);
+    cursor: pointer;
+    line-height: 1;
+    opacity: 0.75;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    padding: 0.6rem 0.8rem;
+    user-select: none;
+  }
+  .lightbox-arrow:hover{ opacity: 1; }
+  #lightbox-prev{ left: 10px; }
+  #lightbox-next{ right: 10px; }
+
+  @media (max-width: 600px){
+    .lightbox-arrow{ font-size: 2rem; padding: 0.5rem 0.6rem; }
+    #lightbox-close{ top: 12px; right: 16px; font-size: 2rem; }
+  }
+
+  #lightbox-counter{
+    position: absolute;
+    bottom: 18px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: var(--cream);
+    opacity: 0.6;
+    font-size: 0.85rem;
+    font-family: 'Poppins', sans-serif;
+  }
 
   /* REVIEWS */
   .reviews{ background: var(--peach); border-radius: 24px; }
@@ -295,6 +351,9 @@
   </div>
   <div id="confetti-layer"></div>
 
+  <audio id="bg-music" src="audio/verjaardagwebsite.mp3" loop></audio>
+  <button id="mute-btn" title="geluid aan/uit">🔊</button>
+
   <div id="site">
 
     <section class="hero">
@@ -349,7 +408,10 @@
 
     <div id="lightbox">
       <span id="lightbox-close">&times;</span>
+      <span class="lightbox-arrow" id="lightbox-prev">&#8249;</span>
       <img id="lightbox-img" src="" alt="">
+      <span class="lightbox-arrow" id="lightbox-next">&#8250;</span>
+      <div id="lightbox-counter"></div>
     </div>
 
 
@@ -484,25 +546,50 @@
   reviewGrid.appendChild(inviteCard);
 
   /* ===================================================================
-     FOTO LIGHTBOX
+     FOTO LIGHTBOX (met vorige/volgende + swipe)
      =================================================================== */
   const lightbox = document.getElementById('lightbox');
   const lightboxImg = document.getElementById('lightbox-img');
   const lightboxClose = document.getElementById('lightbox-close');
+  const lightboxPrev = document.getElementById('lightbox-prev');
+  const lightboxNext = document.getElementById('lightbox-next');
+  const lightboxCounter = document.getElementById('lightbox-counter');
 
-  document.querySelectorAll('.gallery-slot').forEach(img => {
-    img.addEventListener('click', () => {
-      lightboxImg.src = img.src;
-      lightboxImg.alt = img.alt;
-      lightbox.classList.add('open');
-    });
+  const galleryImgs = Array.from(document.querySelectorAll('.gallery-slot'));
+  let currentIndex = -1; // -1 betekent: geen galerijfoto actief (bv. de maker-foto)
+
+  function showImage(index){
+    if(galleryImgs.length === 0) return;
+    currentIndex = (index + galleryImgs.length) % galleryImgs.length;
+    const img = galleryImgs[currentIndex];
+    lightboxImg.src = img.src;
+    lightboxImg.alt = img.alt;
+    lightboxCounter.textContent = `${currentIndex + 1} / ${galleryImgs.length}`;
+    lightboxCounter.style.display = 'block';
+    lightboxPrev.style.display = 'block';
+    lightboxNext.style.display = 'block';
+    lightbox.classList.add('open');
+  }
+
+  galleryImgs.forEach((img, i) => {
+    img.addEventListener('click', () => showImage(i));
   });
 
-  // footer: klik op de naam van de maker toont zijn foto
+  function showNext(){ showImage(currentIndex + 1); }
+  function showPrev(){ showImage(currentIndex - 1); }
+
+  lightboxNext.addEventListener('click', (e) => { e.stopPropagation(); showNext(); });
+  lightboxPrev.addEventListener('click', (e) => { e.stopPropagation(); showPrev(); });
+
+  // footer: klik op de naam van de maker toont zijn foto (geen vorige/volgende hierbij)
   const makerLink = document.getElementById('maker-link');
   makerLink.addEventListener('click', () => {
+    currentIndex = -1;
     lightboxImg.src = 'images/Pirata.JPG';
     lightboxImg.alt = 'De maker van deze website';
+    lightboxCounter.style.display = 'none';
+    lightboxPrev.style.display = 'none';
+    lightboxNext.style.display = 'none';
     lightbox.classList.add('open');
   });
 
@@ -511,9 +598,26 @@
   lightbox.addEventListener('click', (e) => {
     if(e.target === lightbox) closeLightbox();
   });
+
   document.addEventListener('keydown', (e) => {
+    if(!lightbox.classList.contains('open')) return;
     if(e.key === 'Escape') closeLightbox();
+    if(e.key === 'ArrowRight' && currentIndex !== -1) showNext();
+    if(e.key === 'ArrowLeft' && currentIndex !== -1) showPrev();
   });
+
+  // swipe-ondersteuning voor mobiel
+  let touchStartX = 0;
+  let touchEndX = 0;
+  lightbox.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+  lightbox.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    const diff = touchEndX - touchStartX;
+    if(Math.abs(diff) < 40 || currentIndex === -1) return; // te kleine beweging = geen swipe
+    if(diff < 0) showNext(); else showPrev();
+  }, { passive: true });
 
   /* ===================================================================
      ENVELOP + CONFETTI
@@ -541,10 +645,27 @@
     }
   }
 
+  /* ===================================================================
+     MUZIEK AAN/UIT
+     =================================================================== */
+  const bgMusic = document.getElementById('bg-music');
+  const muteBtn = document.getElementById('mute-btn');
+  muteBtn.addEventListener('click', () => {
+    if(bgMusic.muted){
+      bgMusic.muted = false;
+      muteBtn.textContent = '🔊';
+    } else {
+      bgMusic.muted = true;
+      muteBtn.textContent = '🔇';
+    }
+  });
+
   envelope.addEventListener('click', () => {
     if(envelope.classList.contains('open')) return;
     envelope.classList.add('open');
     burstConfetti();
+    bgMusic.play().catch(() => { /* als afspelen mislukt, blijft de knop gewoon werken */ });
+    muteBtn.classList.add('visible');
     setTimeout(() => {
       envScreen.classList.add('hidden');
       site.classList.add('visible');
